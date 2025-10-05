@@ -123,26 +123,27 @@ Agar sistem ini menjadi lebih sempurna dan layak untuk digunakan secara nyata, b
    - Form pembuatan event (nama, deskripsi, tanggal, lokasi, harga, kuota).  
    - Upload gambar event.
 
-2. **Payment Integration**  
-   - Integrasi metode pembayaran seperti Midtrans, Xendit, atau QRIS.
+2. **Manual Payment System**  
+   - Gunakan sistem pembayaran **manual (transfer bank / upload bukti pembayaran)** agar lebih mudah diimplementasikan tanpa integrasi API.  
+   - Admin dapat melakukan **verifikasi pembayaran secara manual** di halaman Ticket Orders.
 
 3. **Ticket Verification System**  
-   - QR Code unik untuk setiap tiket pembelian.
+   - QR Code unik untuk setiap tiket pembelian agar dapat diverifikasi saat check-in.
 
 4. **Notification & Email System**  
-   - Mengirimkan email setelah pembelian tiket berhasil.
+   - Mengirimkan notifikasi atau email konfirmasi setelah pembelian tiket berhasil.
 
 5. **Report & Analytics Dashboard**  
-   - Menampilkan grafik penjualan tiket per event.
+   - Menampilkan grafik penjualan tiket per event untuk memantau performa.
 
 6. **Search & Filter Event**  
-   - Memudahkan user mencari event berdasarkan kategori atau lokasi.
+   - Memudahkan user mencari event berdasarkan kategori, tanggal, atau lokasi.
 
 7. **User Experience (UX) Enhancements**  
-   - Konfirmasi pembelian, tampilan tiket, dan sistem refund.
+   - Konfirmasi pembelian, tampilan tiket digital, dan sistem refund sederhana.
 
 8. **Export & Print Feature**  
-   - Cetak tiket atau laporan ke format PDF / Excel.
+   - Cetak tiket atau laporan penjualan ke format PDF / Excel.
 
 ---
 ## 🧠 Catatan Akhir
