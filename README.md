@@ -1,6 +1,6 @@
-# 🎟️ TicketMaster — Sistem Pembelian Tiket (Seleksi Magang)
+# 🎟️ TicketADT — Sistem Pembelian Tiket (Seleksi Magang)
 
-TicketMaster adalah sistem **pembelian tiket berbasis web** yang dikembangkan sebagai bagian dari proyek seleksi magang.  
+TicketADT adalah sistem **pembelian tiket berbasis web** yang dikembangkan sebagai bagian dari proyek seleksi magang.  
 Aplikasi ini memiliki dua sisi utama:
 - **Admin Panel** → tempat admin membuat dan mengelola event.
 - **User Panel** → tempat pengguna membeli tiket untuk event yang telah dibuat.
@@ -148,7 +148,7 @@ Agar sistem ini menjadi lebih sempurna dan layak untuk digunakan secara nyata, b
 ---
 ## 🧠 Catatan Akhir
 
-README ini menjelaskan **alur utama sistem TicketMaster** secara garis besar.  
+README ini menjelaskan **alur utama sistem TicketADT** secara garis besar.  
 Detail implementasi backend dan logika tambahan sengaja tidak dijabarkan agar pengembang selanjutnya dapat mengembangkan sendiri sesuai logika kerja sistem yang diinginkan.
 
 > 📌 Fokus utama sistem ini:  
