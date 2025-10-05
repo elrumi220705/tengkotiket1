@@ -1,66 +1,161 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎟️ TicketMaster — Sistem Pembelian Tiket (Seleksi Magang)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+TicketMaster adalah sistem **pembelian tiket berbasis web** yang dikembangkan sebagai bagian dari proyek seleksi magang.  
+Aplikasi ini memiliki dua sisi utama:
+- **Admin Panel** → tempat admin membuat dan mengelola event.
+- **User Panel** → tempat pengguna membeli tiket untuk event yang telah dibuat.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🧭 Alur Utama Sistem
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Aplikasi ini masih dalam tahap **setengah jadi**, namun sudah memiliki alur utama sebagai berikut:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. **User dan Admin dapat melakukan registrasi serta login.**
+2. **Admin** dapat mengakses **Dashboard** dan nantinya akan bisa membuat event.
+3. **User** dapat mengakses halaman **Buy Ticket** untuk melihat dan membeli event yang tersedia.
+4. Sistem akan dikembangkan agar **aliran kerja Admin → Event → Pembelian oleh User** berjalan sempurna.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🔐 Kredensial Login
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+| Role | Email | Password |
+|------|--------|-----------|
+| **Admin** | `admin@example.com` | `password123` |
+| **User** | `user@example.com` | `password123` |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🧱 Struktur Halaman
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 🔸 Halaman Autentikasi
+Sistem mendukung **registrasi** dan **login** untuk dua role: admin & user.  
+Berikut tampilan antarmuka login dan registrasi:
 
-### Premium Partners
+| Login | Register |
+|-------|-----------|
+| ![Login Page](public/images/screenshots/login.png) | ![Register Page](public/images/screenshots/regis.png) |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+### 🔸 Admin Panel
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Setelah berhasil login sebagai **Admin**, pengguna diarahkan ke halaman **Dashboard**.  
+Dashboard ini merupakan pusat kontrol untuk mengelola sistem event dan tiket.
 
-## Code of Conduct
+| Admin Dashboard |
+|-----------------|
+| ![Admin Dashboard](public/images/screenshots/admin.png) |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+#### 📋 Menu Utama Admin
+Tampilan sidebar admin mencakup beberapa menu berikut:
 
-## Security Vulnerabilities
+**Main Menu**
+- 🏠 **Dashboard** — Ringkasan informasi utama.
+- 📅 **Events** — (akan diaktifkan) untuk membuat dan mengelola event.
+- 🎟️ **Ticket Orders** — Data pembelian tiket oleh user.
+- 👥 **Customers** — Daftar pengguna yang membeli tiket.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Management**
+- 🏷️ **Ticket Types** — Mengatur kategori tiket (misal: VIP, Regular).
+- 💸 **Promotions** — Menambahkan promo atau potongan harga.
+- 📍 **Venues** — Lokasi tempat event berlangsung.
+- 📊 **Reports** — Laporan penjualan tiket.
 
-## License
+**System**
+- ⚙️ **Settings** — Pengaturan sistem dan profil admin.
+- 🔔 **Notifications** — Notifikasi terkini.
+- ❓ **Help & Support** — Bantuan dan dokumentasi.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+📌 *Pada tahap saat ini, menu-menu tersebut masih dalam bentuk struktur tampilan (UI), dan akan dikembangkan lebih lanjut agar berfungsi penuh.*
+
+---
+
+### 🔸 User Panel
+
+Setelah login sebagai **User**, pengguna diarahkan ke halaman **Buy Tickets** yang menjadi pusat pembelian tiket.
+
+| Buy Ticket |
+|-------------|
+| ![Buy Ticket Page](public/images/screenshots/but-ticket.png) |
+
+#### 📜 Menu Navigasi User
+- 🎟️ **Buy Tickets** → Halaman utama untuk melihat event yang tersedia.
+- 🛍️ **Shop** → (opsional) ruang untuk merchandise event.
+- 🆘 **Help** → Bantuan pengguna.
+- 📰 **News** → Informasi event atau berita terbaru.
+- 📞 **Contact** → Halaman kontak admin.
+- 👤 **My Profile** → Data akun pengguna.
+- 🎫 **My Tickets** → Tiket yang telah dibeli.
+- 🚪 **Logout** → Keluar dari sistem.
+
+---
+
+## ⚙️ Alur Logika Kerja Sistem
+
+Berikut alur kerja utama (main flow) dari sistem ini:
+
+1. **Admin login** ke sistem.  
+   Admin akan diarahkan ke **Dashboard**.
+
+2. **Admin membuat event baru.**  
+   (Fitur ini akan dikembangkan agar admin dapat mengisi nama event, tanggal, lokasi, harga tiket, kapasitas, dan gambar event.)
+
+3. **User login** dan masuk ke halaman **Buy Ticket**.  
+   Sistem akan menampilkan daftar event yang telah dibuat admin.
+
+4. **User memilih event dan membeli tiket.**  
+   Sistem mencatat data pembelian dan mengurangi jumlah stok tiket yang tersedia.
+
+5. **Admin dapat melihat daftar pembelian tiket (Ticket Orders).**  
+   Dari sini, admin bisa memantau penjualan dan melakukan laporan.
+
+> 💡 **Catatan:** Alur ini sudah dirancang di tahap awal agar mudah dikembangkan. Tim pengembang selanjutnya bisa menambahkan detail fungsi sesuai kebutuhan.
+
+---
+
+## 🧩 Pengembangan Selanjutnya
+
+Agar sistem ini menjadi lebih sempurna dan layak untuk digunakan secara nyata, berikut ide pengembangannya:
+
+1. **Event Management Functionality**  
+   - Form pembuatan event (nama, deskripsi, tanggal, lokasi, harga, kuota).  
+   - Upload gambar event.
+
+2. **Payment Integration**  
+   - Integrasi metode pembayaran seperti Midtrans, Xendit, atau QRIS.
+
+3. **Ticket Verification System**  
+   - QR Code unik untuk setiap tiket pembelian.
+
+4. **Notification & Email System**  
+   - Mengirimkan email setelah pembelian tiket berhasil.
+
+5. **Report & Analytics Dashboard**  
+   - Menampilkan grafik penjualan tiket per event.
+
+6. **Search & Filter Event**  
+   - Memudahkan user mencari event berdasarkan kategori atau lokasi.
+
+7. **User Experience (UX) Enhancements**  
+   - Konfirmasi pembelian, tampilan tiket, dan sistem refund.
+
+8. **Export & Print Feature**  
+   - Cetak tiket atau laporan ke format PDF / Excel.
+
+---
+## 🧠 Catatan Akhir
+
+README ini menjelaskan **alur utama sistem TicketMaster** secara garis besar.  
+Detail implementasi backend dan logika tambahan sengaja tidak dijabarkan agar pengembang selanjutnya dapat mengembangkan sendiri sesuai logika kerja sistem yang diinginkan.
+
+> 📌 Fokus utama sistem ini:  
+> - Admin → Buat Event  
+> - User → Beli Tiket  
+> 
+> Detail tambahan seperti pembayaran, laporan, promosi, dan validasi tiket dapat dikembangkan secara modular.
+
+---
+
+© 2025 — TicketMaster System (Seleksi Magang)
