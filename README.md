@@ -82,7 +82,7 @@ Setelah login sebagai **User**, pengguna diarahkan ke halaman **Buy Tickets** ya
 
 #### 📜 Menu Navigasi User
 - 🎟️ **Buy Tickets** → Halaman utama untuk melihat event yang tersedia.
-- 🛍️ **Shop** → (opsional) ruang untuk merchandise event.
+- 🛍️ **Shop** → Deretan event - event yang tersedia.
 - 🆘 **Help** → Bantuan pengguna.
 - 📰 **News** → Informasi event atau berita terbaru.
 - 📞 **Contact** → Halaman kontak admin.
