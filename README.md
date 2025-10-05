@@ -1,7 +1,7 @@
 # 🎟️ TicketADT — Sistem Pembelian Tiket (Seleksi Magang)
 
 TicketADT adalah sistem **pembelian tiket berbasis web** yang dikembangkan sebagai bagian dari proyek seleksi magang.  
-Aplikasi ini memiliki dua sisi utama:
+System ini memiliki dua sisi utama:
 - **Admin Panel** → tempat admin membuat dan mengelola event.
 - **User Panel** → tempat pengguna membeli tiket untuk event yang telah dibuat.
 
@@ -9,7 +9,7 @@ Aplikasi ini memiliki dua sisi utama:
 
 ## 🧭 Alur Utama Sistem
 
-Aplikasi ini masih dalam tahap **setengah jadi**, namun sudah memiliki alur utama sebagai berikut:
+System ini masih dalam tahap **setengah jadi**, namun sudah memiliki alur utama sebagai berikut:
 
 1. **User dan Admin dapat melakukan registrasi serta login.**
 2. **Admin** dapat mengakses **Dashboard** dan nantinya akan bisa membuat event.
