@@ -20,7 +20,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link {{ request()->is('admin/events*') ? 'active' : '' }}">
+                   <a href="{{ route('admin.events.index') }}" class="menu-link {{ request()->is('admin/events*') ? 'active' : '' }}">
                         <i class="bi bi-calendar-event menu-icon"></i>
                         <span class="menu-text">Events</span>
                         <span class="menu-badge">12</span>
