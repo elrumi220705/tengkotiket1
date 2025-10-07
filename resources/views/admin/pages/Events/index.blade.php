@@ -1,5 +1,4 @@
 @extends('admin.layouts.app')
-
 @section('title', 'Daftar Event')
 @section('page-title', 'Manajemen Event')
 
@@ -54,13 +53,13 @@
                             <span class="{{ $badgeClass }}">{{ ucfirst($event->status) }}</span>
                         </td>
                         <td>
-                            <a href="#" class="btn btn-sm btn-info text-white me-1" title="Detail/Edit">
+                            <a href="{{ route('admin.events.edit', $event->id) }}" class="btn btn-sm btn-info text-white me-1" title="Detail/Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form action="#" method="POST" class="d-inline">
+                            <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus event ini?')">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus" onclick="return confirm('APAKAH ANDA YAKIN INGIN MENGHAPUS EVENT INI SECARA PERMANEN?')">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>

@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\EventController as AdminEventController; 
+use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
@@ -28,7 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('pengguna.dashboard');
 
     // Shop & Event Viewing
-    Route::get('/shop', [ShopController::class, 'index'])->name('shop');
+    Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
     Route::get('/event/{event}', [ShopController::class, 'show'])->name('shop.show'); // Rute Detail Event
 
     // Rute Navigasi Lain

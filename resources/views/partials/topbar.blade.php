@@ -11,12 +11,14 @@
             <nav class="nav-menu">
                 <ul class="nav-list">
                     <li class="nav-item">
-                        <a href="{{ route('pengguna.dashboard') }}" class="nav-link {{ request()->routeIs('pengguna.dashboard') ? 'active' : '' }}">
+                        <a href="{{ route('pengguna.dashboard') }}"
+                            class="nav-link {{ request()->routeIs('pengguna.dashboard') ? 'active' : '' }}">
                             Buy Tickets
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('shop') }}" class="nav-link {{ request()->routeIs('shop') ? 'active' : '' }}">
+                        <a href="{{ route('shop.index') }}"
+                            class="nav-link {{ request()->routeIs('shop.index') ? 'active' : '' }}">
                             Shop
                         </a>
                     </li>
@@ -31,7 +33,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('contact') }}" class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">
+                        <a href="{{ route('contact') }}"
+                            class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">
                             Contact
                         </a>
                     </li>
