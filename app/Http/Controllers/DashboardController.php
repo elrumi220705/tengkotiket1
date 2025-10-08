@@ -2,57 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        // Ambil event dengan tanggal terdekat (belum lewat)
+        $mainEvent = Event::where('status', 'published')
+        ->orderBy('tanggal_mulai', 'asc')
+        ->first();
+
+        $similarEvents = Event::where('status', 'published')
+        ->where('id', '!=', $mainEvent?->id)
+        ->orderBy('tanggal_mulai', 'asc')
+        ->take(4)
+        ->get();
+
+        // Siapkan data tambahan (supaya tetap seperti tampilan awal)
         $festivalData = [
-            'title' => 'Pestapora 2024',
+            'title' => $mainEvent->nama_event ?? 'Belum Ada Event',
             'rating' => 4.7,
-            'date' => 'Saturday, August 24, 2024',
-            'time' => '14.00 – 23.00 WIB',
-            'location' => 'Gelora Bung Karno, Jakarta',
-            'description' => 'Pestapora adalah festival musik terbesar di Indonesia yang menghadirkan lineup artis lokal dan internasional terbaik. Tahun ini menampilkan lebih dari 50 artis dari berbagai genre musik seperti pop, rock, indie, EDM, dan R&B. Nikmati pengalaman festival yang tak terlupakan dengan stage yang megah, kuliner khas Indonesia, dan berbagai merchandise eksklusif.',
+            'date' => $mainEvent?->tanggal_mulai?->translatedFormat('l, d F Y') ?? '-',
+            'time' => $mainEvent 
+                ? $mainEvent->tanggal_mulai->format('H:i') . ' - ' . $mainEvent->tanggal_selesai->format('H:i') . ' WIB'
+                : '-',
+            'location' => $mainEvent->lokasi ?? '-',
+            'description' => $mainEvent->deskripsi ?? '-',
             'min_age' => 17,
             'ticket_prices' => [
-                ['type' => 'Early Bird', 'price' => 'Rp 350.000', 'description' => 'Tiket akses standar - terjual cepat'],
-                ['type' => 'Reguler', 'price' => 'Rp 550.000', 'description' => 'Tiket akses standar - available'],
-                ['type' => 'VIP', 'price' => 'Rp 850.000', 'description' => 'Area khusus VIP + lounge access'],
-                ['type' => 'VVIP', 'price' => 'Rp 1.250.000', 'description' => 'Backstage access + meet & greet'],
+                [
+                    'type' => 'Reguler',
+                    'price' => 'Rp ' . number_format($mainEvent->harga_dasar ?? 0, 0, ',', '.'),
+                    'description' => 'Tiket akses standar',
+                ],
             ],
-            'similar_events' => [
-                [
-                    'date' => '15 Sep 2024',
-                    'title' => 'We The Fest 2024',
-                    'location' => 'GBK Tennis Indoor, Jakarta',
-                    'time' => '13:00 WIB',
-                    'image' => 'wethefest.jpg',
-                    'price' => '450',
-                    'description' => 'Festival musik urban terbesar dengan lineup artis lokal dan internasional pilihan'
-                ],
-                [
-                    'date' => '28 Sep 2024',
-                    'title' => 'Djakarta Warehouse Project',
-                    'location' => 'JIExpo Kemayoran, Jakarta',
-                    'time' => '16:00 WIB',
-                    'image' => 'warehouse.jpg',
-                    'price' => '650',
-                    'description' => 'Festival musik elektronik terbesar di Asia Tenggara dengan DJ dunia'
-                ],
-                [
-                    'date' => '12 Oct 2024',
-                    'title' => 'Soundrenaline 2024',
-                    'location' => 'Pantai Carnaval, Ancol Jakarta',
-                    'time' => '12:00 WIB',
-                    'image' => 'soundrenaline.jpg',
-                    'price' => '400',
-                    'description' => 'Festival musik rock dan alternatif dengan atmosfer pantai yang menawan'
-                ],
-            ]
         ];
 
-        return view('pages.dashboard', compact('festivalData'));
+        return view('pages.dashboard', compact('festivalData', 'mainEvent', 'similarEvents'));
     }
 }
