@@ -27,12 +27,12 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link {{ request()->is('admin/ticket-orders*') ? 'active' : '' }}">
-                        <i class="bi bi-ticket-perforated menu-icon"></i>
-                        <span class="menu-text">Ticket Orders</span>
-                        <span class="menu-badge">8</span>
-                    </a>
-                </li>
+  <a href="{{ route('admin.ticket-orders.index') }}" class="menu-link {{ request()->is('admin/ticket-orders*') ? 'active' : '' }}">
+    <i class="bi bi-ticket-perforated menu-icon"></i>
+    <span class="menu-text">Ticket Orders</span>
+  </a>
+</li>
+
                 <li class="menu-item">
                     <a href="#" class="menu-link {{ request()->is('admin/customers*') ? 'active' : '' }}">
                         <i class="bi bi-people-fill menu-icon"></i>
