@@ -64,10 +64,11 @@
                                 <i class="bi bi-person"></i>
                                 My Profile
                             </a>
-                            <a href="#" class="dropdown-item">
+                            <a href="{{ route('tickets.mine') }}" class="dropdown-item">
                                 <i class="bi bi-ticket-perforated"></i>
                                 My Tickets
                             </a>
+
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf

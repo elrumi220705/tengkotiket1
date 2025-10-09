@@ -19,4 +19,10 @@ class TicketOrder extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Tambahan: relasi ke tiket
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }

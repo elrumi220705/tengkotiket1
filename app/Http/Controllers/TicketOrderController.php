@@ -13,14 +13,17 @@ class TicketOrderController extends Controller
         $request->validate([
             'event_id'      => 'required|exists:events,id',
             'quantity'      => 'required|integer|min:1',
-            'payment_proof' => 'required|image|max:2048',
+            // izinkan gambar & pdf, maks 2MB
+            'payment_proof' => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
         ]);
 
         $event = Event::findOrFail($request->event_id);
 
         // pastikan stok cukup (cek dulu, belum mengurangi)
         if (isset($event->stok_tersedia) && $event->stok_tersedia < (int)$request->quantity) {
-            return back()->withErrors(['quantity' => 'Stok tidak mencukupi. Sisa: '.$event->stok_tersedia])->withInput();
+            return back()
+                ->withErrors(['quantity' => 'Stok tidak mencukupi. Sisa: '.$event->stok_tersedia])
+                ->withInput();
         }
 
         $path = $request->file('payment_proof')->store('payments', 'public');
@@ -30,10 +33,12 @@ class TicketOrderController extends Controller
             'user_id'       => auth()->id(),
             'quantity'      => (int)$request->quantity,
             'total_price'   => $event->harga_dasar * (int)$request->quantity,
-            'status'        => 'pending',
+            'status'        => 'pending',          // admin yang set ke 'paid' saat verifikasi
             'payment_proof' => $path,
         ]);
 
-        return redirect()->route('shop.index')->with('ok', 'Pesanan dibuat. Menunggu verifikasi admin.');
+        return redirect()
+            ->route('shop.index')
+            ->with('ok', 'Pesanan dibuat. Menunggu verifikasi admin.');
     }
 }

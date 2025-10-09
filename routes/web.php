@@ -12,6 +12,7 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\TicketOrderController;
+use App\Http\Controllers\MyTicketController;
 
 // Welcome
 Route::get('/welcome', function () { return view('welcome'); });
@@ -35,6 +36,9 @@ Route::middleware(['auth'])->group(function () {
     // Ticket Orders (buat pesanan)
     Route::post('/ticket-orders', [TicketOrderController::class, 'store'])->name('ticket-orders.store');
 
+    // My Tickets (QR muncul setelah order paid)
+    Route::get('/my-tickets', [MyTicketController::class, 'index'])->name('tickets.mine');
+
     // Profile & others
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -55,4 +59,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/ticket-orders/{ticketOrder}/{status}', [AdminTicketOrderController::class, 'updateStatus'])
         ->whereIn('status', ['paid','rejected','pending'])
         ->name('admin.ticket-orders.updateStatus');
+
+    // Lihat tiket (QR) per order
+    Route::get('admin/ticket-orders/{ticketOrder}/tickets', [AdminTicketOrderController::class, 'tickets'])
+        ->name('admin.ticket-orders.tickets');
 });
