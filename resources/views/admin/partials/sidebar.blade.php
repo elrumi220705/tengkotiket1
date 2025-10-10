@@ -23,7 +23,6 @@
                    <a href="{{ route('admin.events.index') }}" class="menu-link {{ request()->is('admin/events*') ? 'active' : '' }}">
                         <i class="bi bi-calendar-event menu-icon"></i>
                         <span class="menu-text">Events</span>
-                        <span class="menu-badge">12</span>
                     </a>
                 </li>
                 <li class="menu-item">
@@ -33,10 +32,13 @@
   </a>
 </li>
 
-                <li class="menu-item">
-                    <a href="#" class="menu-link {{ request()->is('admin/customers*') ? 'active' : '' }}">
-                        <i class="bi bi-people-fill menu-icon"></i>
+                 <li class="menu-item">
+                    <a href="{{ route('admin.users.index') }}" class="menu-link {{ request()->is('admin/users*') ? 'active' : '' }}">
+                        <i class="bi bi-people menu-icon"></i>
                         <span class="menu-text">Customers</span>
+                        @isset($sidebarCounts['users'])
+                          <span class="menu-badge">{{ $sidebarCounts['users'] }}</span>
+                        @endisset
                     </a>
                 </li>
             </ul>

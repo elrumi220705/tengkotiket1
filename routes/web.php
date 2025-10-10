@@ -5,6 +5,11 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\TicketOrderController as AdminTicketOrderController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\SettingController as AdminSettingController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Admin\SupportController as AdminSupportController;
+
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
@@ -24,7 +29,9 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// ==========================
 // USER (auth)
+// ==========================
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('pengguna.dashboard');
 
@@ -48,19 +55,48 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 });
 
+// ==========================
 // ADMIN (auth + admin)
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+// ==========================
+// Catatan: middleware 'admin' sesuai punyamu. Kalau middleware kamu namanya 'is_admin',
+// ubah jadi ->middleware(['auth','is_admin'])
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    Route::resource('admin/events', AdminEventController::class)->names('admin.events');
+        // Dashboard
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    // Ticket Orders Admin
-    Route::get('admin/ticket-orders', [AdminTicketOrderController::class, 'index'])->name('admin.ticket-orders.index');
-    Route::get('admin/ticket-orders/{ticketOrder}/{status}', [AdminTicketOrderController::class, 'updateStatus'])
-        ->whereIn('status', ['paid','rejected','pending'])
-        ->name('admin.ticket-orders.updateStatus');
+        // Events (resource)
+        Route::resource('/events', AdminEventController::class)->names('events');
 
-    // Lihat tiket (QR) per order
-    Route::get('admin/ticket-orders/{ticketOrder}/tickets', [AdminTicketOrderController::class, 'tickets'])
-        ->name('admin.ticket-orders.tickets');
-});
+        // Ticket Orders Admin
+        Route::get('/ticket-orders', [AdminTicketOrderController::class, 'index'])->name('ticket-orders.index');
+
+        // (Saran kuat: ubah ke PATCH supaya RESTful; tapi kalau mau keep GET untuk cepat, biarin)
+        Route::match(['patch','post'], '/ticket-orders/{ticketOrder}/status/{status}', [AdminTicketOrderController::class, 'updateStatus'])
+            ->whereIn('status', ['paid','rejected','pending'])
+            ->name('ticket-orders.updateStatus');
+
+        // Lihat tiket (QR) per order
+        Route::get('/ticket-orders/{ticketOrder}/tickets', [AdminTicketOrderController::class, 'tickets'])
+            ->name('ticket-orders.tickets');
+
+        // ===== Users (baru) =====
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // ===== Settings (baru) =====
+        Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [AdminSettingController::class, 'store'])->name('settings.store'); // atau update
+
+        // ===== Notifications (baru) =====
+        Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/read-all', [AdminNotificationController::class, 'readAll'])->name('notifications.readAll');
+
+        // ===== Support / Help & Support (baru) =====
+        Route::get('/support', [AdminSupportController::class, 'index'])->name('support.index');
+        Route::post('/support', [AdminSupportController::class, 'store'])->name('support.store');
+    });
