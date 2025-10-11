@@ -87,16 +87,4 @@ Route::middleware(['auth', 'admin'])
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
-
-        // ===== Settings (baru) =====
-        Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
-        Route::post('/settings', [AdminSettingController::class, 'store'])->name('settings.store'); // atau update
-
-        // ===== Notifications (baru) =====
-        Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
-        Route::post('/notifications/read-all', [AdminNotificationController::class, 'readAll'])->name('notifications.readAll');
-
-        // ===== Support / Help & Support (baru) =====
-        Route::get('/support', [AdminSupportController::class, 'index'])->name('support.index');
-        Route::post('/support', [AdminSupportController::class, 'store'])->name('support.store');
     });
