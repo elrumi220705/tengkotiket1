@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\SupportController as AdminSupportController;
-
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
@@ -43,8 +43,14 @@ Route::middleware(['auth'])->group(function () {
     // Ticket Orders (buat pesanan)
     Route::post('/ticket-orders', [TicketOrderController::class, 'store'])->name('ticket-orders.store');
 
+    // 🔥 PERBAIKAN: Rute untuk melihat detail pesanan (untuk order pending/rejected)
+    // Rute ini menggunakan 'order.detail' sesuai perbaikan di view.
+    Route::get('/order/{ticketOrder}', [TicketOrderController::class, 'show'])->name('order.detail');
+
+
     // My Tickets (QR muncul setelah order paid)
     Route::get('/my-tickets', [MyTicketController::class, 'index'])->name('tickets.mine');
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('user.notifications.read');
 
     // Profile & others
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -67,6 +73,7 @@ Route::middleware(['auth', 'admin'])
 
         // Dashboard
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
         // Events (resource)
         Route::resource('/events', AdminEventController::class)->names('events');

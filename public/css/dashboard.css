@@ -94,16 +94,16 @@ html {
     .btn-view-map {
         display: none !important;
     }
-    
+
     .main-content {
         padding-top: 0;
     }
-    
+
     .festival-details {
         box-shadow: none;
         border: 1px solid #ddd;
     }
-    
+
     .image-gallery {
         display: none;
     }
@@ -116,7 +116,7 @@ html {
     .btn-event {
         border-width: 2px;
     }
-    
+
     .section-title::after {
         height: 4px;
     }

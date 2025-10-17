@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminDashboardController extends Controller
 {
@@ -12,6 +13,7 @@ class AdminDashboardController extends Controller
      */
     public function index()
     {
+        $unreadNotifications = Auth::user()->unreadNotifications;
         // Data dummy untuk dashboard ticket management - Festival Indonesia
         $dashboardData = [
             'stats' => [
@@ -82,6 +84,6 @@ class AdminDashboardController extends Controller
             ]
         ];
 
-        return view('admin.pages.dashboard', compact('dashboardData'));
+        return view('admin.pages.dashboard', compact('dashboardData', 'unreadNotifications'));
     }
 }

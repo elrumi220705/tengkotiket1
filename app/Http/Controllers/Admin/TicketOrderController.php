@@ -7,15 +7,25 @@ use App\Models\TicketOrder;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth; // 🔥 TAMBAH INI
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+// Import 2 Notifikasi Verifikasi
+use App\Notifications\PaymentVerified;
+use App\Notifications\PaymentRejected;
 
 class TicketOrderController extends Controller
 {
     public function index()
     {
         $orders = TicketOrder::with('event','user')->latest()->get();
-        return view('admin.ticket_orders.index', compact('orders'));
+
+        // 🔥 TAMBAHAN WAJIB: Ambil notifikasi yang belum dibaca
+        $unreadNotifications = Auth::user()->unreadNotifications;
+
+        // Kirim $orders DAN $unreadNotifications ke view
+        return view('admin.ticket_orders.index', compact('orders', 'unreadNotifications'));
     }
 
     public function updateStatus(TicketOrder $ticketOrder, $status)
@@ -26,10 +36,11 @@ class TicketOrderController extends Controller
         }
 
         $oldStatus = $ticketOrder->status;
+        $userToNotify = $ticketOrder->user; // Simpan user untuk notifikasi setelah transaksi
 
         try {
             DB::transaction(function () use ($ticketOrder, $status, $oldStatus) {
-                // ==== Kunci event untuk konsistensi stok ====
+                // ... (Logika kunci event, cek stok, dan update stok) ...
                 $event = $ticketOrder->event()->lockForUpdate()->first();
                 $hasStok = $event && array_key_exists('stok_tersedia', $event->getAttributes());
 
@@ -54,15 +65,12 @@ class TicketOrderController extends Controller
                     if ($ticketOrder->tickets()->count() === 0) {
                         for ($i = 0; $i < $ticketOrder->quantity; $i++) {
                             $code = (string) Str::uuid();
-
-                            // simpan tiket dulu agar dapat ID
                             $ticket = Ticket::create([
                                 'ticket_order_id' => $ticketOrder->id,
                                 'code'            => $code,
                                 'qr_path'         => '',
                             ]);
 
-                            // payload QR (bisa dipakai untuk check-in)
                             $payload = json_encode([
                                 'type'     => 'ticket',
                                 'v'        => 1,
@@ -81,8 +89,6 @@ class TicketOrderController extends Controller
                             } catch (\Throwable $e) {
                                 throw new \RuntimeException('Gagal generate QR: '.$e->getMessage());
                             }
-
-                            // simpan path relatif di DB
                             $ticket->update(['qr_path' => $fileName]);
                         }
                     }
@@ -99,21 +105,45 @@ class TicketOrderController extends Controller
                     $ticketOrder->tickets()->delete();
                 }
 
-                // Update status terakhir
+                // Update status terakhir (di dalam transaksi)
                 $ticketOrder->update(['status' => $status]);
             });
+
+            // ---------------------------------------------
+            // 🔥 LOGIKA NOTIFIKASI: STATUS BERUBAH (DI LUAR DB::transaction)
+            // ---------------------------------------------
+            $message = 'Status pesanan berhasil diperbarui menjadi: ' . ucfirst($status);
+
+            if ($oldStatus !== $status) {
+                if ($status === 'paid') {
+                    // Kirim notifikasi LUNAS (PaymentVerified) ke User
+                    $userToNotify->notify(new PaymentVerified($ticketOrder));
+                    $message = 'Status pesanan #' . $ticketOrder->id . ' berhasil diubah menjadi LUNAS (Paid). Notifikasi ke pengguna terkirim.';
+
+                } elseif ($status === 'rejected') {
+                    // Kirim notifikasi DITOLAK (PaymentRejected) ke User
+                    // User model perlu di-load ulang untuk memastikan notifikasi terkirim dengan benar jika objek userToNotify sudah di luar scope
+                    $userToNotify->notify(new PaymentRejected($ticketOrder));
+                    $message = 'Status pesanan #' . $ticketOrder->id . ' berhasil diubah menjadi DITOLAK (Rejected). Notifikasi ke pengguna terkirim.';
+                }
+            }
+
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         } catch (\Throwable $e) {
-            return back()->with('error', 'Gagal memperbarui status. '.$e->getMessage());
+            return back()->with('error', 'Gagal memperbarui status. ' . $e->getMessage());
         }
 
-        return back()->with('ok', 'Status pesanan berhasil diperbarui menjadi: '.ucfirst($status));
+        return back()->with('ok', $message);
     }
 
     public function tickets(TicketOrder $ticketOrder)
     {
         $ticketOrder->load('tickets','event','user');
-        return view('admin.ticket_orders.tickets', compact('ticketOrder'));
+
+        // 🔥 TAMBAHAN WAJIB: Ambil notifikasi yang belum dibaca (Karena ini juga memakai layout admin)
+        $unreadNotifications = Auth::user()->unreadNotifications;
+
+        return view('admin.ticket_orders.tickets', compact('ticketOrder', 'unreadNotifications'));
     }
 }
