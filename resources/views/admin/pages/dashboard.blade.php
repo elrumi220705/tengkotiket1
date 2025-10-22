@@ -12,7 +12,6 @@
     <h1 class="dashboard-title">Dashboard</h1>
 </div>
 
-<!-- Stats Grid -->
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-content">
@@ -22,9 +21,9 @@
             <div class="stat-details">
                 <div class="stat-number">{{ number_format($dashboardData['stats']['total_tickets']) }}</div>
                 <div class="stat-title">Total Tiket</div>
-                <div class="stat-change positive">
-                    <i class="bi bi-arrow-up"></i>
-                    18.2%
+                <div class="stat-change {{ $dashboardData['stats']['change_ticket_status'] }}">
+                    <i class="bi bi-arrow-{{ $dashboardData['stats']['change_ticket_status'] == 'positive' ? 'up' : 'down' }}"></i>
+                    {{ $dashboardData['stats']['change_ticket'] }}%
                 </div>
             </div>
         </div>
@@ -38,9 +37,9 @@
             <div class="stat-details">
                 <div class="stat-number">Rp{{ number_format($dashboardData['stats']['total_revenue'], 0, ',', '.') }}</div>
                 <div class="stat-title">Total Pendapatan</div>
-                <div class="stat-change positive">
-                    <i class="bi bi-arrow-up"></i>
-                    22.7%
+                <div class="stat-change {{ $dashboardData['stats']['change_revenue_status'] }}">
+                    <i class="bi bi-arrow-{{ $dashboardData['stats']['change_revenue_status'] == 'positive' ? 'up' : 'down' }}"></i>
+                    {{ $dashboardData['stats']['change_revenue'] }}%
                 </div>
             </div>
         </div>
@@ -54,9 +53,9 @@
             <div class="stat-details">
                 <div class="stat-number">{{ $dashboardData['stats']['pending_tickets'] }}</div>
                 <div class="stat-title">Tiket Pending</div>
-                <div class="stat-change negative">
-                    <i class="bi bi-arrow-down"></i>
-                    3.5%
+                <div class="stat-change {{ $dashboardData['stats']['change_pending_status'] }}">
+                    <i class="bi bi-arrow-{{ $dashboardData['stats']['change_pending_status'] == 'positive' ? 'up' : 'down' }}"></i>
+                    {{ $dashboardData['stats']['change_pending'] }}%
                 </div>
             </div>
         </div>
@@ -70,18 +69,16 @@
             <div class="stat-details">
                 <div class="stat-number">{{ number_format($dashboardData['stats']['attendees_count']) }}</div>
                 <div class="stat-title">Total Peserta</div>
-                <div class="stat-change positive">
-                    <i class="bi bi-arrow-up"></i>
-                    25.3%
+                <div class="stat-change {{ $dashboardData['stats']['change_attendees_status'] }}">
+                    <i class="bi bi-arrow-{{ $dashboardData['stats']['change_attendees_status'] == 'positive' ? 'up' : 'down' }}"></i>
+                    {{ $dashboardData['stats']['change_attendees'] }}%
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Charts Section -->
 <div class="charts-grid">
-    <!-- Revenue Chart -->
     <div class="chart-card">
         <div class="chart-header">
             <h3 class="chart-title">Pendapatan Bulanan (Rupiah)</h3>
@@ -92,41 +89,47 @@
         </div>
         <div class="chart-container">
             <div class="simple-bars">
+                @php
+                    $maxValue = max($dashboardData['monthly_sales']['data']) ?: 1;
+                @endphp
                 @foreach($dashboardData['monthly_sales']['data'] as $index => $value)
-                <div class="bar-container">
-                    <div class="bar" style="height: {{ ($value / max($dashboardData['monthly_sales']['data'])) * 180 }}px;"></div>
-                    <div class="bar-label">{{ $dashboardData['monthly_sales']['labels'][$index] }}</div>
-                </div>
+                    @php
+                        $height = ($value / $maxValue) * 180;
+                    @endphp
+                    <div class="bar-container">
+                        <div class="bar" style="height: {{ $height }}px;"></div>
+                        <div class="bar-label">{{ $dashboardData['monthly_sales']['labels'][$index] }}</div>
+                    </div>
                 @endforeach
             </div>
         </div>
     </div>
 
-    <!-- Top Events -->
     <div class="chart-card">
         <div class="chart-header">
             <h3 class="chart-title">Festival Terpopuler</h3>
         </div>
         <div class="mini-chart">
+            @php
+                $maxTickets = max(array_column($dashboardData['top_events'], 'tickets_sold')) ?: 1;
+            @endphp
             @foreach($dashboardData['top_events'] as $event)
-            <div class="mini-chart-item">
-                <div class="mini-chart-info">
-                    <div class="mini-chart-name">{{ $event['name'] }}</div>
-                    <div class="mini-chart-stats">{{ number_format($event['tickets_sold']) }} tiket</div>
-                    <div class="mini-chart-bar">
-                        <div class="mini-chart-progress" style="width: {{ ($event['tickets_sold'] / max(array_column($dashboardData['top_events'], 'tickets_sold'))) * 100 }}%"></div>
+                <div class="mini-chart-item">
+                    <div class="mini-chart-info">
+                        <div class="mini-chart-name">{{ $event['name'] }}</div>
+                        <div class="mini-chart-stats">{{ number_format($event['tickets_sold']) }} tiket</div>
+                        <div class="mini-chart-bar">
+                            <div class="mini-chart-progress" style="width: {{ ($event['tickets_sold'] / $maxTickets) * 100 }}%"></div>
+                        </div>
                     </div>
+                    <div class="mini-chart-value">Rp{{ number_format($event['revenue'], 0, ',', '.') }}</div>
                 </div>
-                <div class="mini-chart-value">Rp{{ number_format($event['revenue'], 0, ',', '.') }}</div>
-            </div>
             @endforeach
         </div>
     </div>
 </div>
 
-<!-- Recent Tickets & Quick Actions -->
 <div class="row">
-    <!-- Recent Tickets -->
     <div class="col">
         <div class="card">
             <div class="card-header">
@@ -136,20 +139,20 @@
             <div class="p-0">
                 <ul class="activity-list">
                     @foreach($dashboardData['recent_tickets'] as $ticket)
-                    <li class="activity-item">
-                        <div class="activity-icon">
-                            <i class="bi bi-ticket-perforated"></i>
-                        </div>
-                        <div class="activity-details">
-                            <div class="activity-title">{{ $ticket['event'] }}</div>
-                            <div class="activity-meta">
-                                {{ $ticket['customer'] }} • {{ $ticket['type'] }} • Rp{{ number_format($ticket['price'], 0, ',', '.') }}
+                        <li class="activity-item">
+                            <div class="activity-icon">
+                                <i class="bi bi-ticket-perforated"></i>
                             </div>
-                        </div>
-                        <div class="activity-badge badge-{{ $ticket['status'] }}">
-                            {{ ucfirst($ticket['status']) }}
-                        </div>
-                    </li>
+                            <div class="activity-details">
+                                <div class="activity-title">{{ $ticket['event'] }}</div>
+                                <div class="activity-meta">
+                                    {{ $ticket['customer'] }} • {{ $ticket['type'] }} • Rp{{ number_format($ticket['price'], 0, ',', '.') }}
+                                </div>
+                            </div>
+                            <div class="activity-badge badge-{{ $ticket['status'] }}">
+                                {{ ucfirst($ticket['status']) }}
+                            </div>
+                        </li>
                     @endforeach
                 </ul>
             </div>

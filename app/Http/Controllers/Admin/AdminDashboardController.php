@@ -5,85 +5,164 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Models\TicketOrder;
+use App\Models\Event;
+use App\Models\User;
 
 class AdminDashboardController extends Controller
 {
-    /**
-     * Display admin dashboard
-     */
     public function index()
     {
         $unreadNotifications = Auth::user()->unreadNotifications;
-        // Data dummy untuk dashboard ticket management - Festival Indonesia
+
+        $paidStatus = 'paid';
+        $pendingStatus = 'pending';
+
+        $startOfCurrentMonth = Carbon::now()->startOfMonth();
+        $startOfPreviousMonth = Carbon::now()->subMonth()->startOfMonth();
+        $endOfPreviousMonth = Carbon::now()->subMonth()->endOfMonth();
+
+        $totalTicketsCurrent = TicketOrder::where('status', $paidStatus)
+            ->where('updated_at', '>=', $startOfCurrentMonth)
+            ->sum('quantity');
+        $totalTicketsPrevious = TicketOrder::where('status', $paidStatus)
+            ->whereBetween('updated_at', [$startOfPreviousMonth, $endOfPreviousMonth])
+            ->sum('quantity');
+        $totalTickets = TicketOrder::where('status', $paidStatus)->sum('quantity');
+        $ticketChange = $this->calculatePercentageChange($totalTicketsCurrent, $totalTicketsPrevious);
+
+        $totalRevenueCurrent = TicketOrder::where('status', $paidStatus)
+            ->where('updated_at', '>=', $startOfCurrentMonth)
+            ->sum('total_price');
+        $totalRevenuePrevious = TicketOrder::where('status', $paidStatus)
+            ->whereBetween('updated_at', [$startOfPreviousMonth, $endOfPreviousMonth])
+            ->sum('total_price');
+        $totalRevenue = TicketOrder::where('status', $paidStatus)->sum('total_price');
+        $revenueChange = $this->calculatePercentageChange($totalRevenueCurrent, $totalRevenuePrevious);
+
+        $pendingOrders = TicketOrder::where('status', $pendingStatus)->count();
+        $pendingOrdersPrevious = TicketOrder::where('status', $pendingStatus)
+            ->whereBetween('created_at', [$startOfPreviousMonth, $endOfPreviousMonth])
+            ->count();
+        $pendingChange = $this->calculatePercentageChange($pendingOrdersPrevious, $pendingOrders);
+        $pendingChange['status'] = $pendingChange['percentage'] >= 0 ? 'negative' : 'positive';
+
+        $attendeesCount = User::where('role', 'pengguna')->count();
+        $attendeesCurrent = User::where('role', 'pengguna')
+            ->where('created_at', '>=', $startOfCurrentMonth)
+            ->count();
+        $attendeesPrevious = User::where('role', 'pengguna')
+            ->whereBetween('created_at', [$startOfPreviousMonth, $endOfPreviousMonth])
+            ->count();
+        $attendeesChange = $this->calculatePercentageChange($attendeesCurrent, $attendeesPrevious);
+
+        $stats = [
+            'total_tickets' => $totalTickets,
+            'total_revenue' => $totalRevenue,
+            'pending_tickets' => $pendingOrders,
+            'events_count' => Event::where('status', 'published')->count(),
+            'attendees_count' => $attendeesCount,
+            'change_ticket' => $ticketChange['percentage'],
+            'change_ticket_status' => $ticketChange['status'],
+            'change_revenue' => $revenueChange['percentage'],
+            'change_revenue_status' => $revenueChange['status'],
+            'change_pending' => $pendingChange['percentage'],
+            'change_pending_status' => $pendingChange['status'],
+            'change_attendees' => $attendeesChange['percentage'],
+            'change_attendees_status' => $attendeesChange['status'],
+        ];
+
+        $recentTicketOrders = TicketOrder::with(['event', 'user'])
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'event' => $order->event->nama_event ?? 'Event Dihapus',
+                    'customer' => $order->user->name ?? 'Pengguna Dihapus',
+                    'type' => $order->quantity . ' Tiket',
+                    'price' => $order->total_price,
+                    'status' => $order->status,
+                    'date' => $order->created_at->format('Y-m-d'),
+                ];
+            })->toArray();
+
+        $topEventsData = $this->getTopEventsData($paidStatus);
+        $monthlySalesData = $this->getMonthlySalesData($paidStatus);
+
         $dashboardData = [
-            'stats' => [
-                'total_tickets' => 8560,
-                'pending_tickets' => 45,
-                'sold_tickets' => 7820,
-                'total_revenue' => 12580000,
-                'events_count' => 15,
-                'attendees_count' => 12450
-            ],
-            'recent_tickets' => [
-                [
-                    'id' => 'TKT-2024-001',
-                    'event' => 'DWP 2024 - Djakarta Warehouse Project',
-                    'customer' => 'Ahmad Rizki',
-                    'type' => 'VIP 2 Days',
-                    'price' => 3500000,
-                    'status' => 'confirmed',
-                    'date' => '2024-03-15'
-                ],
-                [
-                    'id' => 'TKT-2024-002',
-                    'event' => 'We The Fest 2024',
-                    'customer' => 'Sarah Putri',
-                    'type' => 'General Admission',
-                    'price' => 1850000,
-                    'status' => 'pending',
-                    'date' => '2024-03-14'
-                ],
-                [
-                    'id' => 'TKT-2024-003',
-                    'event' => 'Java Jazz Festival 2024',
-                    'customer' => 'Budi Santoso',
-                    'type' => 'Gold Pass',
-                    'price' => 2750000,
-                    'status' => 'confirmed',
-                    'date' => '2024-03-13'
-                ],
-                [
-                    'id' => 'TKT-2024-004',
-                    'event' => 'Bali Arts Festival',
-                    'customer' => 'Maya Sari',
-                    'type' => 'Weekend Pass',
-                    'price' => 850000,
-                    'status' => 'confirmed',
-                    'date' => '2024-03-12'
-                ],
-                [
-                    'id' => 'TKT-2024-005',
-                    'event' => 'Soundrenaline 2024',
-                    'customer' => 'Rizky Pratama',
-                    'type' => 'Early Bird',
-                    'price' => 650000,
-                    'status' => 'cancelled',
-                    'date' => '2024-03-11'
-                ]
-            ],
-            'top_events' => [
-                ['name' => 'DWP 2024 - Djakarta Warehouse Project', 'tickets_sold' => 12500, 'revenue' => 2875000000],
-                ['name' => 'We The Fest 2024', 'tickets_sold' => 8500, 'revenue' => 1572500000],
-                ['name' => 'Java Jazz Festival 2024', 'tickets_sold' => 6200, 'revenue' => 1364000000],
-                ['name' => 'Soundrenaline 2024', 'tickets_sold' => 4800, 'revenue' => 312000000],
-                ['name' => 'Bali Arts Festival', 'tickets_sold' => 3200, 'revenue' => 272000000]
-            ],
-            'monthly_sales' => [
-                'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                'data' => [450000000, 680000000, 1258000000, 950000000, 1100000000, 1420000000, 1650000000, 1880000000, 1250000000, 980000000, 1150000000, 2100000000]
-            ]
+            'stats' => $stats,
+            'recent_tickets' => $recentTicketOrders,
+            'top_events' => $topEventsData,
+            'monthly_sales' => $monthlySalesData,
         ];
 
         return view('admin.pages.dashboard', compact('dashboardData', 'unreadNotifications'));
+    }
+
+    protected function calculatePercentageChange($current, $previous)
+    {
+        if ($previous == 0) {
+            $percentage = $current > 0 ? 100.0 : 0.0;
+        } else {
+            $percentage = (($current - $previous) / $previous) * 100;
+        }
+
+        $status = $percentage >= 0 ? 'positive' : 'negative';
+
+        return [
+            'percentage' => abs(round($percentage, 1)),
+            'status' => $status
+        ];
+    }
+
+    protected function getMonthlySalesData(string $paidStatus)
+    {
+        $months = [];
+        $sales = [];
+        $now = Carbon::now();
+
+        for ($i = 11; $i >= 0; $i--) {
+            $date = $now->copy()->subMonths($i);
+            $monthName = $date->shortMonthName;
+            $year = $date->year;
+
+            $revenue = TicketOrder::where('status', $paidStatus)
+                ->whereYear('updated_at', $year)
+                ->whereMonth('updated_at', $date->month)
+                ->sum('total_price');
+
+            $months[] = $monthName;
+            $sales[] = (int)$revenue;
+        }
+
+        return [
+            'labels' => $months,
+            'data' => $sales,
+        ];
+    }
+
+    protected function getTopEventsData(string $paidStatus)
+    {
+        $topEvents = Event::leftJoin('ticket_orders', 'events.id', '=', 'ticket_orders.event_id')
+            ->select(
+                'events.nama_event',
+                DB::raw('SUM(CASE WHEN ticket_orders.status = "'.$paidStatus.'" THEN ticket_orders.quantity ELSE 0 END) as tickets_sold_count'),
+                DB::raw('SUM(CASE WHEN ticket_orders.status = "'.$paidStatus.'" THEN ticket_orders.total_price ELSE 0 END) as total_revenue')
+            )
+            ->groupBy('events.id', 'events.nama_event')
+            ->orderByDesc('tickets_sold_count')
+            ->limit(5)
+            ->get();
+
+        return $topEvents->map(function ($event) {
+            return [
+                'name' => $event->nama_event,
+                'tickets_sold' => (int)$event->tickets_sold_count,
+                'revenue' => (int)$event->total_revenue,
+            ];
+        })->toArray();
     }
 }
