@@ -30,6 +30,19 @@ class MyTicketController extends Controller
         $userNotifications = $user->notifications()->latest()->paginate(10);
 
         // Mengirimkan SEMUA data ke view
-        return view('shop.my_tickets', compact('tickets', 'pendingOrders', 'userNotifications')); // 🔥 Tambahkan 'pendingOrders'
+        return view('shop.my_tickets', compact('tickets', 'pendingOrders', 'userNotifications'));
+    }
+
+    /**
+     * Menampilkan tiket digital satuan
+     */
+    public function show(Ticket $ticket)
+    {
+        // Hanya pemilik tiket yang boleh melihat
+        if (auth()->id() !== $ticket->order->user_id) {
+            return redirect()->route('tickets.mine')->with('error', 'Anda tidak punya akses ke tiket ini.');
+        }
+
+        return view('tickets.show', compact('ticket'));
     }
 }

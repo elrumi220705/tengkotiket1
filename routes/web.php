@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
-use App\Http\Controllers\Admin\TicketOrderController as AdminTicketOrderController;
+use App\Http\Controllers\Admin\AdminTicketOrderController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
@@ -40,16 +40,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/event/{event}', [ShopController::class, 'show'])->name('shop.show');
     Route::get('/checkout/{event}', [ShopController::class, 'checkout'])->name('shop.checkout');
 
-    // Ticket Orders (buat pesanan)
+    // Ticket Orders
     Route::post('/ticket-orders', [TicketOrderController::class, 'store'])->name('ticket-orders.store');
-
-    // 🔥 PERBAIKAN: Rute untuk melihat detail pesanan (untuk order pending/rejected)
-    // Rute ini menggunakan 'order.detail' sesuai perbaikan di view.
     Route::get('/order/{ticketOrder}', [TicketOrderController::class, 'show'])->name('order.detail');
 
-
-    // My Tickets (QR muncul setelah order paid)
+    // My Tickets
     Route::get('/my-tickets', [MyTicketController::class, 'index'])->name('tickets.mine');
+    Route::get('/my-tickets/{ticket}', [MyTicketController::class, 'show'])->name('tickets.show');
+
+    // Notifications
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('user.notifications.read');
 
     // Profile & others
@@ -64,8 +63,6 @@ Route::middleware(['auth'])->group(function () {
 // ==========================
 // ADMIN (auth + admin)
 // ==========================
-// Catatan: middleware 'admin' sesuai punyamu. Kalau middleware kamu namanya 'is_admin',
-// ubah jadi ->middleware(['auth','is_admin'])
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
@@ -75,22 +72,17 @@ Route::middleware(['auth', 'admin'])
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
-        // Events (resource)
+        // Events
         Route::resource('/events', AdminEventController::class)->names('events');
 
-        // Ticket Orders Admin
+        // Ticket Orders
         Route::get('/ticket-orders', [AdminTicketOrderController::class, 'index'])->name('ticket-orders.index');
-
-        // (Saran kuat: ubah ke PATCH supaya RESTful; tapi kalau mau keep GET untuk cepat, biarin)
         Route::match(['patch','post'], '/ticket-orders/{ticketOrder}/status/{status}', [AdminTicketOrderController::class, 'updateStatus'])
             ->whereIn('status', ['paid','rejected','pending'])
             ->name('ticket-orders.updateStatus');
+        Route::post('/ticket-orders/{ticketOrder}/refund', [AdminTicketOrderController::class, 'refund'])->name('ticket-orders.refund');
 
-        // Lihat tiket (QR) per order
-        Route::get('/ticket-orders/{ticketOrder}/tickets', [AdminTicketOrderController::class, 'tickets'])
-            ->name('ticket-orders.tickets');
-
-        // ===== Users (baru) =====
+        // Users
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
