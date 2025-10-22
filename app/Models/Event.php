@@ -20,6 +20,7 @@ class Event extends Model
         'kapasitas_total',
         'stok_tersedia',
         'status',
+        'kategori', // <— TAMBAH: kategori
     ];
 
     protected $casts = [

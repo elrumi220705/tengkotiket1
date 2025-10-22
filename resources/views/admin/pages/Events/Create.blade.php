@@ -42,6 +42,16 @@
                     </div>
 
                     <div class="form-group mb-3">
+                        <label for="kategori" class="form-label fw-bold">Kategori Event <span class="text-danger">*</span></label>
+                        <select class="form-control" id="kategori" name="kategori" required>
+                            <option value="">Pilih Kategori</option>
+                            <option value="workshop" {{ old('kategori') == 'workshop' ? 'selected' : '' }}>Workshop</option>
+                            <option value="seminar" {{ old('kategori') == 'seminar' ? 'selected' : '' }}>Seminar</option>
+                            <option value="konser" {{ old('kategori') == 'konser' ? 'selected' : '' }}>Konser</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
                         <label for="deskripsi" class="form-label fw-bold">Deskripsi Event</label>
                         <textarea class="form-control" id="deskripsi" name="deskripsi" rows="5">{{ old('deskripsi') }}</textarea>
                     </div>
