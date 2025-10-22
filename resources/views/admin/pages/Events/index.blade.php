@@ -23,6 +23,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Nama Event</th>
+                    <th>Kategori</th> {{-- Tambah kolom kategori --}}
                     <th>Tanggal</th>
                     <th>Harga Dasar</th>
                     <th>Stok Tersedia</th>
@@ -35,6 +36,11 @@
                     <tr>
                         <td>{{ $event->id }}</td>
                         <td>{{ $event->nama_event }}</td>
+                        <td>
+                            <span class="badge bg-info text-dark">
+                                {{ ucfirst($event->kategori) }}
+                            </span>
+                        </td>
                         <td>{{ \Carbon\Carbon::parse($event->tanggal_mulai)->translatedFormat('d M Y') }}</td>
                         <td>Rp{{ number_format($event->harga_dasar, 0, ',', '.') }}</td>
                         <td>
@@ -67,7 +73,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center">Belum ada Event yang dibuat. Klik 'Tambah Event Baru' untuk memulai.</td>
+                        <td colspan="8" class="text-center">Belum ada Event yang dibuat. Klik 'Tambah Event Baru' untuk memulai.</td>
                     </tr>
                 @endforelse
             </tbody>
