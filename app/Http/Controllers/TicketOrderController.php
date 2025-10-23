@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\User;
 use App\Notifications\NewTicketOrder;
 use App\Notifications\OrderConfirmation;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TicketOrderController extends Controller
 {
@@ -32,8 +33,10 @@ class TicketOrderController extends Controller
                 ->withInput();
         }
 
+        // Simpan bukti pembayaran
         $path = $request->file('payment_proof')->store('payments', 'public');
 
+        // Simpan data pesanan
         $order = TicketOrder::create([
             'event_id'      => $event->id,
             'user_id'       => auth()->id(),
@@ -51,9 +54,7 @@ class TicketOrderController extends Controller
         auth()->user()->notify(new OrderConfirmation($order));
 
         // 2. Kirim notifikasi order baru ke Admin (via Database & Email)
-        // Cari admin pertama di sistem
         $admin = User::where('role', 'admin')->first();
-
         if ($admin) {
             $admin->notify(new NewTicketOrder($order));
         }
@@ -76,7 +77,30 @@ class TicketOrderController extends Controller
             return redirect()->route('tickets.mine')->with('error', 'Pesanan tidak ditemukan atau Anda tidak memiliki akses.');
         }
 
-        // Tampilkan view detail order. View ini HARUS dibuat di resources/views/shop/order_detail.blade.php
+        // Tampilkan view detail order
         return view('shop.order_detail', compact('ticketOrder'));
+    }
+
+    /**
+     * 🧾 Export semua transaksi tiket ke PDF untuk admin dashboard
+     */
+    public function exportPdf()
+    {
+        // Ambil semua order (bisa difilter misalnya status = paid jika ingin)
+        $orders = TicketOrder::with('event', 'user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalRevenue = $orders->sum('total_price');
+
+        // Buat file PDF dari view
+        $pdf = Pdf::loadView('admin.pdf.ticket_orders', [
+            'orders' => $orders,
+            'totalRevenue' => $totalRevenue,
+            'date' => now()->format('d F Y, H:i'),
+        ])->setPaper('a4', 'portrait');
+
+        // Tampilkan PDF di browser
+        return $pdf->stream('laporan_transaksi_tiket.pdf');
     }
 }

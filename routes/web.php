@@ -86,4 +86,8 @@ Route::middleware(['auth', 'admin'])
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        Route::get('/ticket-orders/pdf', [TicketOrderController::class, 'exportPdf'])
+        ->name('ticketOrders.exportPdf');
+
     });

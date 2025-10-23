@@ -8,8 +8,12 @@
 @endpush
 
 @section('content')
-<div class="dashboard-header">
+<div class="dashboard-header d-flex justify-content-between align-items-center">
     <h1 class="dashboard-title">Dashboard</h1>
+    {{-- 🔽 Tombol Cetak PDF Laporan Penjualan Tiket --}}
+    <a href="{{ route('admin.ticketOrders.exportPdf') }}" target="_blank" class="btn btn-danger">
+        <i class="bi bi-file-earmark-pdf"></i> Cetak Laporan PDF
+    </a>
 </div>
 
 <div class="stats-grid">
