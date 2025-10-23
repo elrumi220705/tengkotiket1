@@ -9,7 +9,7 @@
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
         th { background-color: #f5f5f5; }
-        .footer { text-align: right; font-size: 12px; }
+        .footer { text-align: right; font-size: 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -32,12 +32,12 @@
             @foreach($orders as $index => $order)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $order->event->nama ?? '-' }}</td>
+                <td>{{ $order->event->nama_event ?? '-' }}</td>
                 <td>{{ $order->user->name ?? '-' }}</td>
                 <td>{{ $order->quantity }}</td>
                 <td>Rp{{ number_format($order->total_price, 0, ',', '.') }}</td>
                 <td>{{ ucfirst($order->status) }}</td>
-                <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                <td>{{ $order->created_at->timezone('Asia/Jakarta')->translatedFormat('d F Y') }}</td>
             </tr>
             @endforeach
         </tbody>
